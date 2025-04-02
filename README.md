@@ -1,6 +1,6 @@
 # RStudio Runner
 
-[![GitHub](https://img.shields.io/badge/GitHub-Repository-blue)](https://github.com/kerrydu/runstudio)
+[![GitHub](https://img.shields.io/badge/GitHub-Repository-blue)](https://github.com/kerrydu/runrstudio)
 
 一个用于快速发送代码到RStudio运行的工具，支持VSIX离线安装。
 
@@ -18,6 +18,6 @@
 
 ## 快捷键
 
-- 运行选中代码: Ctrl+Enter (Windows) / Cmd+Enter (Mac)
-- 运行到光标处: Ctrl+Alt+\\ (Windows) / Cmd+Option+\\ (Mac)
-- 从光标处运行到结尾: Ctrl+Shift+Enter (Windows) / Cmd+Shift+Enter (Mac)
+- 运行选中代码: Ctrl+Enter (Windows)  |  Cmd+Enter (Mac)
+- 运行到光标处: Ctrl+Alt+\\ (Windows)   | Cmd+Option+\\ (Mac)
+- 从光标处运行到结尾: Ctrl+Shift+Enter (Windows) | Cmd+Shift+Enter (Mac)

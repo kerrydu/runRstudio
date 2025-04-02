@@ -7,7 +7,7 @@
   "icon": "images/icon.png",
   "repository": {
     "type": "git",
-    "url": "https://github.com/kerrydu/runstudio"
+    "url": "https://github.com/kerrydu/runrstudio"
   },
   "engines": {
     "vscode": "^1.75.0"
