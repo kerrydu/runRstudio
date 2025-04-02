@@ -1,0 +1,90 @@
+{
+  "name": "rstudio-runner",
+  "displayName": "RStudio Runner",
+  "description": "Send code from VS Code to RStudio for execution",
+  "version": "0.3.0",
+  "publisher": "kerrydu",
+  "icon": "images/icon.png",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/kerrydu/runstudio"
+  },
+  "engines": {
+    "vscode": "^1.75.0"
+  },
+  "categories": [
+    "Other"
+  ],
+  "activationEvents": [
+    "onCommand:rstudio-runner.runSelection",
+    "onCommand:rstudio-runner.runToCursor",
+    "onCommand:rstudio-runner.runFromCursorToEnd"
+  ],
+  "main": "./extension.js",
+  "contributes": {
+    "configuration": {
+      "title": "RStudio Runner",
+      "properties": {
+        "rstudioRunner.rstudioPath": {
+          "type": "string",
+          "default": "",
+          "description": "Path to RStudio executable [Windows only]"
+        }
+
+      }
+    },
+    "commands": [
+      {
+        "command": "rstudio-runner.runSelection",
+        "title": "Run Selection in RStudio"
+      },
+      {
+        "command": "rstudio-runner.runToCursor",
+        "title": "Run To Cursor in RStudio"
+      },
+      {
+        "command": "rstudio-runner.runFromCursorToEnd",
+        "title": "Run From Cursor To End in RStudio"
+      }
+    ],
+    "keybindings": [
+      {
+        "command": "rstudio-runner.runSelection",
+        "key": "ctrl+enter",
+        "mac": "cmd+enter",
+        "when": "editorTextFocus && (resourceLangId == r || resourceLangId == rmd)"
+      },
+      {
+        "command": "rstudio-runner.runToCursor",
+        "key": "ctrl+alt+enter",
+        "mac": "cmd+option+enter",
+        "when": "editorTextFocus && (resourceLangId == r || resourceLangId == rmd)"
+      },
+      {
+        "command": "rstudio-runner.runFromCursorToEnd",
+        "key": "ctrl+alt+\\",
+        "mac": "ctrl+option+\\",
+        "when": "editorTextFocus && (resourceLangId == r || resourceLangId == rmd)"
+      }
+    ]
+  },
+  "files": [
+    "extension.js"
+  ],
+  "scripts": {
+    "lint": "eslint .",
+    "pretest": "npm run lint",
+    "test": "node ./test/runTest.js"
+  },
+  "devDependencies": {
+    "@types/vscode": "^1.75.0",
+    "@types/glob": "^8.0.0",
+    "@types/mocha": "^10.0.0",
+    "@types/node": "16.x",
+    "eslint": "^8.0.0",
+    "glob": "^8.0.0",
+    "mocha": "^10.0.0",
+    "typescript": "^4.9.3",
+    "@vscode/test-electron": "^2.2.0"
+  }
+}
