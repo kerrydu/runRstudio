@@ -2,7 +2,7 @@
 
 [![GitHub](https://img.shields.io/badge/GitHub-Repository-blue)](https://github.com/kerrydu/runstudio)
 
-一个用于快速发送代码到RStudio的Windows工具，支持VSIX离线安装。
+一个用于快速发送代码到RStudio运行的工具，支持VSIX离线安装。
 
 ## 功能特点
 
@@ -12,15 +12,9 @@
 
 ## 安装指南
 
-1. 下载`rstudio-runner-0.2.0.vsix`文件
+1. 下载`rstudio-runner-0.3.0.vsix`文件
 2. 离线安装VSIX扩展
 3. 配置RStudio.exe路径(Mac不需要配置)
-
-## 使用方法
-
-1. 复制要运行的代码
-2. 执行脚本（Windows需提供RStudio.exe路径）
-3. 代码将自动发送到RStudio并执行
 
 ## 快捷键
 
