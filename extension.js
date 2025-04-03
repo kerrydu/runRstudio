@@ -1,5 +1,11 @@
 const vscode = require('vscode');
 const { exec } = require('child_process');
+const fs = require('fs');
+
+// 本地化函数
+function localize(key, defaultMessage, ...args) {
+    return defaultMessage.replace(/\{([0-9]+)\}/g, (match, index) => args[index] || match);
+}
 
 async function executeCommand(editor, rangeType, rstudioPath) {
     if (!editor) return;
