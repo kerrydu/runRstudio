@@ -80,6 +80,9 @@ async function sendToRStudio(code, rstudioPath) {
             }
         };
         
+        console.log(`[RStudio Runner] Platform: ${process.platform}`);
+        console.log(`[RStudio Runner] Attempting to send code to RStudio...`);
+        
         copyWithRetry().then(() => {
             if (process.platform === 'win32') {
                 // Windows平台使用AHK exe文件
@@ -98,12 +101,16 @@ async function sendToRStudio(code, rstudioPath) {
                 // macOS平台使用AppleScript
                 const scriptPath = vscode.extensions.getExtension('kerrydu.rstudio-runner').extensionPath + '/send_to_rstudio.scpt';
                 
+                console.log(`[RStudio Runner] Executing AppleScript: ${scriptPath}`);
                 exec(`osascript "${scriptPath}"`, { timeout: 10000 }, (error, stdout, stderr) => {
                     if (error) {
+                        console.error(`[RStudio Runner] AppleScript error: ${error.message}`);
                         reject(new Error(`Script execution failed: ${error.message}`));
                     } else if (stderr) {
+                        console.error(`[RStudio Runner] AppleScript stderr: ${stderr}`);
                         reject(new Error(`Script error: ${stderr}`));
                     } else {
+                        console.log('[RStudio Runner] AppleScript executed successfully');
                         resolve();
                     }
                 });
