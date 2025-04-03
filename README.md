@@ -12,7 +12,7 @@
 
 ## 安装指南
 
-1. 下载`rstudio-runner-0.3.12.vsix`文件
+1. 下载`rstudio-runner-0.3.2.vsix`文件
 2. 离线安装VSIX扩展
 3. 配置RStudio.exe路径(Mac不需要配置)
 
