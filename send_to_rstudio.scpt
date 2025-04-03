@@ -29,11 +29,11 @@ on run
             -- 启动RStudio
             tell application "RStudio" to activate
             
-            set timeoutSeconds to 10
+            set waitSeconds to 10
             set startTime to current date
             repeat
-                if (current date) - startTime > timeoutSeconds then
-                    error "Application failed to start within " & timeoutSeconds & " seconds"
+                if (current date) - startTime > waitSeconds then
+                    error "Application failed to start within " & waitSeconds & " seconds"
                 end if
                 
                 try
