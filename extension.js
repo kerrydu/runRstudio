@@ -1,55 +1,63 @@
 const vscode = require('vscode');
 const { exec } = require('child_process');
 
+async function executeCommand(editor, rangeType, rstudioPath) {
+    if (!editor) return;
+    
+    const range = getDocumentRange(editor, rangeType);
+    const text = editor.document.getText(range);
+    
+    try {
+        await sendToRStudioWithRetry(text, rstudioPath);
+        vscode.window.showInformationMessage(localize('success.message', 'Code sent to RStudio successfully'));
+    } catch (error) {
+        vscode.window.showErrorMessage(localize('error.message', 'Failed to send code to RStudio: {0}', error.message));
+    }
+}
+
+async function sendToRStudioWithRetry(text, rstudioPath, maxRetries = 3) {
+    let lastError;
+    
+    for (let i = 0; i < maxRetries; i++) {
+        try {
+            return await sendToRStudio(text, rstudioPath);
+        } catch (error) {
+            lastError = error;
+            await new Promise(resolve => setTimeout(resolve, 1000));
+        }
+    }
+    
+    throw lastError;
+}
+
+function validateRStudioPath(path) {
+    if (process.platform !== 'win32') return;
+    if (!path) throw new Error(localize('path.empty', 'RStudio path is not configured'));
+    if (!fs.existsSync(path)) throw new Error(localize('path.invalid', 'RStudio path does not exist'));
+}
+
 function activate(context) {
     const config = vscode.workspace.getConfiguration('rstudioRunner');
     const rstudioPath = config.get('rstudioPath');
-    const shortcutKey = '^2';
-
+    
+    try {
+        validateRStudioPath(rstudioPath);
+    } catch (error) {
+        vscode.window.showErrorMessage(error.message);
+        return;
+    }
+    
     context.subscriptions.push(
         vscode.commands.registerCommand('rstudio-runner.runSelection', async () => {
-            const editor = vscode.window.activeTextEditor;
-            if (!editor) return;
-            
-            const range = getDocumentRange(editor, 'selection');
-            const text = editor.document.getText(range);
-            
-            try {
-                await sendToRStudio(text, rstudioPath);
-                vscode.window.showInformationMessage('Code sent to RStudio successfully');
-            } catch (error) {
-                vscode.window.showErrorMessage(`Failed to send code to RStudio: ${error.message}`);
-            }
+            executeCommand(vscode.window.activeTextEditor, 'selection', rstudioPath);
         }),
         
         vscode.commands.registerCommand('rstudio-runner.runToCursor', async () => {
-            const editor = vscode.window.activeTextEditor;
-            if (!editor) return;
-            
-            const range = getDocumentRange(editor, 'toCursor');
-            const text = editor.document.getText(range);
-            
-            try {
-                await sendToRStudio(text, rstudioPath);
-                vscode.window.showInformationMessage('Code sent to RStudio successfully');
-            } catch (error) {
-                vscode.window.showErrorMessage(`Failed to send code to RStudio: ${error.message}`);
-            }
+            executeCommand(vscode.window.activeTextEditor, 'toCursor', rstudioPath);
         }),
         
         vscode.commands.registerCommand('rstudio-runner.runFromCursorToEnd', async () => {
-            const editor = vscode.window.activeTextEditor;
-            if (!editor) return;
-            
-            const range = getDocumentRange(editor, 'fromCursor');
-            const text = editor.document.getText(range);
-            
-            try {
-                await sendToRStudio(text, rstudioPath);
-                vscode.window.showInformationMessage('Code sent to RStudio successfully');
-            } catch (error) {
-                vscode.window.showErrorMessage(`Failed to send code to RStudio: ${error.message}`);
-            }
+            executeCommand(vscode.window.activeTextEditor, 'fromCursor', rstudioPath);
         })
     );
 }

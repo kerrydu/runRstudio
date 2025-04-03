@@ -2,7 +2,7 @@
   "name": "rstudio-runner",
   "displayName": "RStudio Runner",
   "description": "Send code from VS Code to RStudio for execution",
-  "version": "0.3.0",
+  "version": "0.3.1",
   "publisher": "kerrydu",
   "icon": "images/icon.png",
   "repository": {
