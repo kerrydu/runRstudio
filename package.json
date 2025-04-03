@@ -52,19 +52,19 @@
         "command": "rstudio-runner.runSelection",
         "key": "ctrl+enter",
         "mac": "cmd+enter",
-        "when": "editorTextFocus && (resourceLangId == r || resourceLangId == rmd)"
+        "when": "editorTextFocus && (editorLangId == r || editorLangId == rmd)"
       },
       {
         "command": "rstudio-runner.runToCursor",
         "key": "ctrl+alt+enter",
         "mac": "cmd+option+enter",
-        "when": "editorTextFocus && (resourceLangId == r || resourceLangId == rmd)"
+        "when": "editorTextFocus && (editorLangId == r || editorLangId == rmd)"
       },
       {
         "command": "rstudio-runner.runFromCursorToEnd",
         "key": "ctrl+alt+\\",
         "mac": "ctrl+option+\\",
-        "when": "editorTextFocus && (resourceLangId == r || resourceLangId == rmd)"
+        "when": "editorTextFocus && (editorLangId == r || editorLangId == rmd)"
       }
     ]
   },
