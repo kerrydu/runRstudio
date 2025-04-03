@@ -29,18 +29,16 @@ on run
             -- 启动RStudio
             tell application "RStudio" to activate
             
-            set timeout to 10
+            set timeoutSeconds to 10
             set startTime to current date
             repeat
-                if (current date) - startTime > timeout then
-                    error "Application failed to start within " & timeout & " seconds"
+                if (current date) - startTime > timeoutSeconds then
+                    error "Application failed to start within " & timeoutSeconds & " seconds"
                 end if
                 
                 try
                     if exists (processes where name is "RStudio") then exit repeat
-                    else
-                        if exists (processes where name is "R") then exit repeat
-                    end if
+                    if exists (processes where name is "R") then exit repeat
                 end try
                 delay 1
             end repeat
