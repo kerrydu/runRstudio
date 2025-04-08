@@ -1,10 +1,80 @@
 const vscode = require('vscode');
-const { exec } = require('child_process');
+const { exec, spawn } = require('child_process');
 const fs = require('fs');
+const path = require('path');
 
 // 本地化函数
 function localize(key, defaultMessage, ...args) {
     return defaultMessage.replace(/\{([0-9]+)\}/g, (match, index) => args[index] || match);
+}
+
+function getCodeToRun(editor, mode) {
+    const document = editor.document;
+    const selection = editor.selection;
+    
+    if (mode === 'selection') {
+        if (selection.isEmpty) {
+            return document.lineAt(selection.active.line).text;
+        }
+        return document.getText(selection);
+    }
+    
+    if (mode === 'toCursor') {
+        const startPos = new vscode.Position(0, 0);
+        const endPos = selection.active;
+        return document.getText(new vscode.Range(startPos, endPos));
+    }
+    
+    if (mode === 'fromCursor') {
+        const startPos = selection.active;
+        const endPos = document.lineAt(document.lineCount - 1).range.end;
+        return document.getText(new vscode.Range(startPos, endPos));
+    }
+    
+    return document.getText();
+}
+
+async function runCodeOnServer(mode) {
+    const editor = vscode.window.activeTextEditor;
+    if (!editor) {
+        vscode.window.showErrorMessage('No active editor');
+        return;
+    }
+
+    const config = vscode.workspace.getConfiguration('rstudioRunner');
+    const port = config.get('serverPort') || 9222;
+    
+    let code = getCodeToRun(editor, mode);
+    if (!code) return;
+
+    const extension = vscode.extensions.getExtension('kerrydu.rstudio-runner');
+    const pythonScript = path.join(extension.extensionPath, 'rstudio_server_sender.py');
+    const pythonProcess = spawn('python', [pythonScript, code]);
+    
+    pythonProcess.on('close', (code) => {
+        if (code !== 0) {
+            vscode.window.showErrorMessage('Failed to send code to RStudio Server');
+            return;
+        }
+        
+        // 根据平台执行不同的激活脚本
+        const extension = vscode.extensions.getExtension('kerrydu.rstudio-runner');
+        if (process.platform === 'win32') {
+            const activateExe = path.join(extension.extensionPath, 'activaterserver.exe');
+            exec(`"${activateExe}"`, (error) => {
+                if (error) {
+                    vscode.window.showErrorMessage('Failed to activate RStudio Server window');
+                }
+            });
+        } else if (process.platform === 'darwin') {
+            const activateScript = path.join(extension.extensionPath, 'activate_rstudio.scpt');
+            exec(`osascript "${activateScript}"`, (error) => {
+                if (error) {
+                    vscode.window.showErrorMessage('Failed to activate RStudio Server window');
+                }
+            });
+        }
+    });
 }
 
 async function executeCommand(editor, rangeType, rstudioPath) {
@@ -64,6 +134,10 @@ function activate(context) {
         
         vscode.commands.registerCommand('rstudio-runner.runFromCursorToEnd', async () => {
             executeCommand(vscode.window.activeTextEditor, 'fromCursor', rstudioPath);
+        }),
+        
+        vscode.commands.registerCommand('rstudio-runner.runSelectionServer', async () => {
+            runCodeOnServer('selection');
         })
     );
 }

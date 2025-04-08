@@ -2,7 +2,7 @@
   "name": "rstudio-runner",
   "displayName": "RStudio Runner",
   "description": "Send code from VS Code to RStudio for execution",
-  "version": "0.3.2",
+  "version": "0.4.2",
   "publisher": "kerrydu",
   "icon": "images/icon.png",
   "repository": {
@@ -18,7 +18,8 @@
   "activationEvents": [
     "onCommand:rstudio-runner.runSelection",
     "onCommand:rstudio-runner.runToCursor",
-    "onCommand:rstudio-runner.runFromCursorToEnd"
+    "onCommand:rstudio-runner.runFromCursorToEnd",
+    "onCommand:rstudio-runner.runSelectionServer"
   ],
   "main": "./extension.js",
   "contributes": {
@@ -29,6 +30,11 @@
           "type": "string",
           "default": "",
           "description": "Path to RStudio executable [Windows only]"
+        },
+        "rstudioRunner.serverPort": {
+          "type": "number",
+          "default": 9222,
+          "description": "Debug port for RStudio Server connection"
         }
 
       }
@@ -45,6 +51,10 @@
       {
         "command": "rstudio-runner.runFromCursorToEnd",
         "title": "Run From Cursor To End in RStudio"
+      },
+      {
+        "command": "rstudio-runner.runSelectionServer",
+        "title": "Run Selection in RStudio Server"
       }
     ],
     "keybindings": [
@@ -66,10 +76,20 @@
         "mac": "ctrl+option+\\",
         "when": "editorTextFocus && (editorLangId == r || editorLangId == rmd)"
       }
-    ]
+    ],
+    "menus": {
+      "editor/context": [
+        {
+          "command": "rstudio-runner.runSelectionServer",
+          "when": "editorTextFocus && (editorLangId == r || editorLangId == rmd)",
+          "group": "navigation@1"
+        }
+      ]
+    }
   },
   "files": [
-    "extension.js"
+    "extension.js",
+    "rstudio_server_sender.py"
   ],
   "scripts": {
     "lint": "eslint .",
