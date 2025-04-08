@@ -43,6 +43,7 @@ async function runCodeOnServer(mode) {
 
     const config = vscode.workspace.getConfiguration('rstudioRunner');
     const port = config.get('serverPort') || 9222;
+    const chromePath = config.get('chromePath') || '';
     
     let code = getCodeToRun(editor, mode);
     if (!code) return;
@@ -54,11 +55,21 @@ async function runCodeOnServer(mode) {
 
     const extension = vscode.extensions.getExtension('kerrydu.rstudio-runner');
     const pythonScript = path.join(extension.extensionPath, 'rstudio_server_sender.py');
-    const pythonProcess = spawn('python', [pythonScript, code]);
+    const pythonProcess = spawn('python', [pythonScript, code, config.get('chromePath') || '']);
+    
+    let errorOutput = '';
+    pythonProcess.stderr.on('data', (data) => {
+        errorOutput += data.toString();
+    });
     
     pythonProcess.on('close', (code) => {
-        if (code !== 0) {
-            vscode.window.showErrorMessage('Failed to send code to RStudio Server');
+        if (code !== 0 || errorOutput) {
+            const outputChannel = vscode.window.createOutputChannel('RStudio Runner');
+            outputChannel.appendLine(errorOutput);
+            outputChannel.show(true);
+            
+            const shortError = errorOutput.split('\n')[0] || 'Failed to send code to RStudio Server';
+            vscode.window.showErrorMessage(shortError);
             return;
         }
         

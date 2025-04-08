@@ -2,7 +2,7 @@
   "name": "rstudio-runner",
   "displayName": "RStudio Runner",
   "description": "Send code from VS Code to RStudio for execution",
-  "version": "0.4.4",
+  "version": "0.4.5",
   "publisher": "kerrydu",
   "icon": "images/icon.png",
   "repository": {
@@ -35,6 +35,11 @@
           "type": "number",
           "default": 9222,
           "description": "Debug port for RStudio Server connection"
+        },
+        "rstudioRunner.chromePath": {
+          "type": "string",
+          "default": "",
+          "description": "Path to Chrome executable for RStudio Server connection"
         }
 
       }
