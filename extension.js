@@ -46,6 +46,11 @@ async function runCodeOnServer(mode) {
     
     let code = getCodeToRun(editor, mode);
     if (!code) return;
+    
+    // Clean and escape the code before sending
+    code = code.trim();
+    code = code.replace(/\\/g, '\\\\');
+    code = code.replace(/\"/g, '\"');
 
     const extension = vscode.extensions.getExtension('kerrydu.rstudio-runner');
     const pythonScript = path.join(extension.extensionPath, 'rstudio_server_sender.py');
