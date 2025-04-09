@@ -43,19 +43,21 @@ async function runCodeOnServer(mode) {
 
     const config = vscode.workspace.getConfiguration('rstudioRunner');
     const port = config.get('serverPort') || 9222;
-    const chromePath = config.get('chromePath') || '';
+    const debugPort = config.get('debugPort') || 9222;
     
     let code = getCodeToRun(editor, mode);
     if (!code) return;
+    
+    const extension = vscode.extensions.getExtension('kerrydu.rstudio-runner');
+    const command = `python "${path.join(extension.extensionPath, 'rstudio_server_sender.py')}" "${code}" ${debugPort}`;
     
     // Clean and escape the code before sending
     code = code.trim();
     code = code.replace(/\\/g, '\\\\');
     code = code.replace(/\"/g, '\"');
 
-    const extension = vscode.extensions.getExtension('kerrydu.rstudio-runner');
     const pythonScript = path.join(extension.extensionPath, 'rstudio_server_sender.py');
-    const pythonProcess = spawn('python', [pythonScript, code, config.get('chromePath') || '']);
+    const pythonProcess = spawn('python', [pythonScript, code]);
     
     let errorOutput = '';
     pythonProcess.stderr.on('data', (data) => {
@@ -154,6 +156,40 @@ function activate(context) {
         
         vscode.commands.registerCommand('rstudio-runner.runSelectionServer', async () => {
             runCodeOnServer('selection');
+        }),
+        
+        vscode.commands.registerCommand('rstudio-runner.launchChrome', async () => {
+            const config = vscode.workspace.getConfiguration('rstudioRunner');
+            const port = config.get('serverPort') || 9222;
+    const debugPort = config.get('debugPort') || 9222;
+            const chromePath = config.get('chromePath') || '';
+            
+            if (!chromePath) {
+                vscode.window.showErrorMessage('请先配置Chrome路径');
+                return;
+            }
+            
+            const extension = vscode.extensions.getExtension('kerrydu.rstudio-runner');
+            const pythonScript = path.join(extension.extensionPath, 'chrome_launcher.py');
+            const pythonProcess = spawn('python', [pythonScript, chromePath]);
+            
+            let errorOutput = '';
+            pythonProcess.stderr.on('data', (data) => {
+                errorOutput += data.toString();
+            });
+            
+            pythonProcess.on('close', (code) => {
+                if (code !== 0 || errorOutput) {
+                    const outputChannel = vscode.window.createOutputChannel('RStudio Runner');
+                    outputChannel.appendLine(errorOutput);
+                    outputChannel.show(true);
+                    
+                    const shortError = errorOutput.split('\n')[0] || '启动Chrome失败';
+                    vscode.window.showErrorMessage(shortError);
+                } else {
+                    vscode.window.showInformationMessage('Chrome调试接口已成功启动');
+                }
+            });
         })
     );
 }

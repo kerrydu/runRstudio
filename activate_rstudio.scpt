@@ -1,10 +1,14 @@
 try
-    tell application "System Events"
-        tell process "Chromium"
-            set frontmost to true
-            perform action "AXRaise" of (first window whose title contains "RStudio Server")
-        end tell
-    end tell
-on error
-    display dialog "Chromium未运行！请先启动Chromium浏览器。" 
+	tell application "System Events"
+		-- 检查 Chromium 进程是否存在
+		if not (exists process "Chromium") then
+            display dialog "请先打开Chrome登录Rstudio Server" buttons {"OK"} default button 1
+		else
+			-- 激活已存在的 Chromium 窗口
+			tell application "Chromium" to activate
+			delay 0.5 -- 确保窗口焦点切换完成
+		end if
+	end tell
+on error errMsg
+	display dialog "操作失败：" & errMsg buttons {"OK"} default button 1
 end try
