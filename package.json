@@ -97,10 +97,6 @@
       ]
     }
   },
-  "files": [
-    "extension.js",
-    "rstudio_server_sender.py"
-  ],
   "scripts": {
     "lint": "eslint .",
     "pretest": "npm run lint",

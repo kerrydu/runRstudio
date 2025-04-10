@@ -171,7 +171,7 @@ function activate(context) {
             
             const extension = vscode.extensions.getExtension('kerrydu.rstudio-runner');
             const pythonScript = path.join(extension.extensionPath, 'chrome_launcher.py');
-            const pythonProcess = spawn('python', [pythonScript, chromePath]);
+            const pythonProcess = spawn('python', [pythonScript, chromePath, debugPort.toString()]);
             
             let errorOutput = '';
             pythonProcess.stderr.on('data', (data) => {

@@ -52,7 +52,14 @@ def send_r_code(code, debug_port=9222):
 if __name__ == "__main__":
     import sys
     if len(sys.argv) < 2:
-        print("Usage: python rstudio_server_sender.py 'R code'")
+        print("[ERROR] 请提供要执行的R代码作为参数", file=sys.stderr)
         sys.exit(1)
     
-    send_r_code(sys.argv[1])
+    r_code = sys.argv[1]
+    debug_port = int(sys.argv[2]) if len(sys.argv) > 2 else 9222
+    
+    try:
+        send_r_code(r_code, debug_port)
+    except Exception as e:
+        print(f"[ERROR] {str(e)}", file=sys.stderr)
+        sys.exit(1)
