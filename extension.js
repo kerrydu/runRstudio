@@ -171,25 +171,36 @@ function activate(context) {
             
             const extension = vscode.extensions.getExtension('kerrydu.rstudio-runner');
             const pythonScript = path.join(extension.extensionPath, 'chrome_launcher.py');
-            const pythonProcess = spawn('python', [pythonScript, chromePath, debugPort.toString()]);
-            
-            let errorOutput = '';
-            pythonProcess.stderr.on('data', (data) => {
-                errorOutput += data.toString();
-            });
-            
-            pythonProcess.on('close', (code) => {
-                if (code !== 0 || errorOutput) {
-                    const outputChannel = vscode.window.createOutputChannel('RStudio Runner');
-                    outputChannel.appendLine(errorOutput);
-                    outputChannel.show(true);
-                    
-                    const shortError = errorOutput.split('\n')[0] || '启动Chrome失败';
-                    vscode.window.showErrorMessage(shortError);
-                } else {
-                    vscode.window.showInformationMessage('Chrome调试接口已成功启动');
-                }
-            });
+            if (process.platform === 'darwin') {
+                const scriptPath = path.join(extension.extensionPath, 'chromium_launcher.scpt');
+                exec(`osascript "${scriptPath}"`, (error, stdout, stderr) => {
+                    if (error) {
+                        vscode.window.showErrorMessage('启动Chromium失败: ' + error.message);
+                    } else {
+                        vscode.window.showInformationMessage('Chromium调试接口已成功启动');
+                    }
+                });
+            } else {
+                const pythonProcess = spawn('python', [pythonScript, chromePath, debugPort.toString()]);
+                
+                let errorOutput = '';
+                pythonProcess.stderr.on('data', (data) => {
+                    errorOutput += data.toString();
+                });
+                
+                pythonProcess.on('close', (code) => {
+                    if (code !== 0 || errorOutput) {
+                        const outputChannel = vscode.window.createOutputChannel('RStudio Runner');
+                        outputChannel.appendLine(errorOutput);
+                        outputChannel.show(true);
+                        
+                        const shortError = errorOutput.split('\n')[0] || '启动Chrome失败';
+                        vscode.window.showErrorMessage(shortError);
+                    } else {
+                        vscode.window.showInformationMessage('Chrome调试接口已成功启动');
+                    }
+                });
+            }
         })
     );
 }
